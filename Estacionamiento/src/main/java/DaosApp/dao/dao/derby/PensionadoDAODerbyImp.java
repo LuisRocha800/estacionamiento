@@ -31,14 +31,13 @@ public class PensionadoDAODerbyImp extends Conexion implements Pensionado_DAO{
 		
 		try{
 		
-			sql = "INSERT INTO PENSIONADOS(id_tag, nombre, apellido, vigencia_tarjeta, cajon) VALUES(?,?,?,?,?)";
+			sql = "INSERT INTO PENSIONADOS(id_tag, nombre, apellido, vigencia_tarjeta) VALUES(?,?,?,?)";
 			stmt = this.conexion.prepareStatement(sql); 
 			
 			stmt.setString(1, pen.getId_tag());
 			stmt.setString(2, pen.getNombre());
 			stmt.setString(3, pen.getApellido());
 			stmt.setString(4, pen.getVigencia_tarjeta());
-			stmt.setString(5, pen.getCajon());
 
             ins = stmt.executeUpdate();
 
@@ -72,14 +71,13 @@ public class PensionadoDAODerbyImp extends Conexion implements Pensionado_DAO{
 		
 		try{
 		
-			sql = "UPDATE PENSIONADOS SET nombre = ?, apellido = ?, vigencia_tarjeta = ?, cajon = ? WHERE id_tag = ?";
+			sql = "UPDATE PENSIONADOS SET nombre = ?, apellido = ?, vigencia_tarjeta = ? WHERE id_tag = ?";
 			stmt = this.conexion.prepareStatement(sql); 
 			
 			stmt.setString(1, pen.getNombre());
 			stmt.setString(2, pen.getApellido());
 			stmt.setString(3, pen.getVigencia_tarjeta());
-			stmt.setString(4, pen.getCajon());
-			stmt.setString(5, pen.getId_tag());
+			stmt.setString(4, pen.getId_tag());
 
             ins = stmt.executeUpdate();
 
@@ -132,7 +130,6 @@ public class PensionadoDAODerbyImp extends Conexion implements Pensionado_DAO{
 					consultado.setNombre(rs.getString("nombre"));
 					consultado.setApellido(rs.getString("apellido"));
 					consultado.setVigencia_tarjeta(rs.getString("vigencia_tarjeta"));
-					consultado.setCajon(rs.getString("cajon"));
 					
 				}
 				return consultado;
@@ -168,11 +165,6 @@ public class PensionadoDAODerbyImp extends Conexion implements Pensionado_DAO{
 		if(val != null) {
 			resul.put("vigencia_tarjeta", val);
 		}	
-		
-		val = pen.getCajon();
-		if(val != null) {
-			resul.put("cajon", val);
-		}
 		
 		return resul;
 	}

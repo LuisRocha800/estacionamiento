@@ -92,10 +92,12 @@ public class InvitadoSessions extends HttpServlet {
 		            int minutos = horaActual.getMinute();
 		            int segundos = horaActual.getSecond();
 		            
-		            mvmt.setId_tag(tagid);
+		            mvmt.setId_tag_personal("None");
+  				    mvmt.setId_tag_pensionado("None");
+  				    mvmt.setId_tag_invitado(tagid);
 		            mvmt.setStatus("Completo");
 		            mvmt.setTipe_movement(opcnUsr);
-		            nfc_movements nfcm = nfc.create(mvmt);
+		            mvmt = nfc.create(mvmt);
 		            
 		            crd.setEstatus("OCUPADO");
 		            crd.setId_tag(tagid);

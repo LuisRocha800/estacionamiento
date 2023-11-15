@@ -28,12 +28,16 @@ public class nfc_movementsDaoDerbyImp extends Conexion implements nfc_movements_
 		
 		try{
 		
-			sql = "INSERT INTO NFC_MOVEMENTS_TEST(id_tag, date_mov, time_mov, status, tipe_movement) VALUES(?,CURRENT_DATE,CURRENT_TIME,?,?)";
+			sql = "INSERT INTO NFC_MOVEMENTS_TEST(id_tag_personal, id_tag_pensionado, id_tag_invitado,"
+					+ "date_mov, time_mov, status, TIPE_MOVEMENT) VALUES ("
+					+ "?, ?, ?, CURRENT_DATE, CURRENT_TIME, ?, ?)";
 			stmt = this.conexion.prepareStatement(sql); 
 			
-			stmt.setString(1, mov.getId_tag());
-			stmt.setString(2, mov.getStatus());
-			stmt.setString(3, mov.getTipe_movement());
+			stmt.setString(1, mov.getId_tag_personal());
+			stmt.setString(2, mov.getId_tag_pensionado());
+			stmt.setString(3, mov.getId_tag_invitado());
+			stmt.setString(4, mov.getStatus());
+			stmt.setString(5, mov.getTipe_movement());
 
             ins = stmt.executeUpdate();
 
@@ -92,11 +96,12 @@ public class nfc_movementsDaoDerbyImp extends Conexion implements nfc_movements_
 				    sql+=cad;
 				}
 				sql = sql.substring(0,sql.length()-5);
-				//System.out.println(sql);
 				rs = stmt.executeQuery(sql);
 				consultado = new nfc_movements();
 				while(rs.next()) {
-					consultado.setId_tag(rs.getString("id_tag"));
+					consultado.setId_tag_personal(rs.getString("id_tag_personal"));
+					consultado.setId_tag_pensionado(rs.getString("id_tag_pensionado"));
+					consultado.setId_tag_personal(rs.getString("id_tag_invitado"));
 					consultado.setDate_mov(rs.getString("date_mov"));
 					consultado.setTime_mov(rs.getString("time_mov"));
 					consultado.setStatus(rs.getString("status"));
@@ -118,9 +123,19 @@ public class nfc_movementsDaoDerbyImp extends Conexion implements nfc_movements_
 		Map<String, Object> resul = new HashMap<String, Object>();
 		String val;
 		
-		val = mov.getId_tag();
+		val = mov.getId_tag_personal();
 		if(val != null) {
-			resul.put("id_tag", val);
+			resul.put("id_tag_personal", val);
+		}
+		
+		val = mov.getId_tag_pensionado();
+		if(val != null) {
+			resul.put("id_tag_pensionado", val);
+		}
+		
+		val = mov.getId_tag_invitado();
+		if(val != null) {
+			resul.put("id_tag_invitado", val);
 		}
 		
 		val = mov.getDate_mov();

@@ -163,10 +163,12 @@ public class leerUIDPensionado extends HttpServlet {
  			                + "</html>");
 	        	} else {
 	        		
-	        		mvmt.setId_tag(tagid);
+					mvmt.setId_tag_personal("None");
+					mvmt.setId_tag_pensionado(tagid);
+					mvmt.setId_tag_invitado("None");
 					mvmt.setStatus("Completo");
 					mvmt.setTipe_movement("Entrada");
-					nfc_movements nfcm = nfc.create(mvmt);
+					mvmt = nfc.create(mvmt);
 					
 					PrintWriter salida = response.getWriter();
 			        response.setContentType("text/html");

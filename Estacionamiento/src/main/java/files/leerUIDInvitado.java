@@ -115,7 +115,7 @@ public class leerUIDInvitado extends HttpServlet {
 	            
 	            nfc_movementsDaoDerbyImp nfc = new nfc_movementsDaoDerbyImp();
 	            nfc_movements mvmt = new nfc_movements();
-	            mvmt.setId_tag(iddeltag);
+	            mvmt.setId_tag_invitado(url);
 	            
 	            mvmt = nfc.get(mvmt);
 	            
@@ -215,7 +215,9 @@ public class leerUIDInvitado extends HttpServlet {
       			                + "</body>\r\n"
       			                + "</html>");
       			        
-      			      mvmt.setId_tag(iddeltag);
+      			        mvmt.setId_tag_personal("None");
+      				    mvmt.setId_tag_pensionado("None");
+      				    mvmt.setId_tag_invitado(iddeltag);
 						mvmt.setStatus("Completo");
 						mvmt.setTipe_movement("salida");
 						mvmt = nfc.create(mvmt);

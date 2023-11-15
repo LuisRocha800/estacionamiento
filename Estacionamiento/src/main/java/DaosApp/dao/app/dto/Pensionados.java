@@ -6,7 +6,6 @@ public class Pensionados {
 	private String nombre;
 	private String apellido;
 	private String vigencia_tarjeta;
-	private String cajon;
 	
 	public String getId_tag() {
 		return id_tag;
@@ -32,16 +31,10 @@ public class Pensionados {
 	public void setVigencia_tarjeta(String vigencia_tarjeta) {
 		this.vigencia_tarjeta = vigencia_tarjeta;
 	}
-	public String getCajon() {
-		return cajon;
-	}
-	public void setCajon(String cajon) {
-		this.cajon = cajon;
-	}
 	
 	public String toString() {
 		return "Pensionados [id_tag=" + id_tag + ", nombre=" + nombre + ", apellido=" + apellido + ", vigencia_tarjeta="
-				+ vigencia_tarjeta + ", cajon=" + cajon + "]";
+				+ vigencia_tarjeta + "]";
 	}
 
 	

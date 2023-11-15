@@ -113,11 +113,13 @@ public class leerUID extends HttpServlet {
  			                + "</body>\r\n"
  			                + "</html>");
  				} else if (tagid != null) { 					
-					mvmt.setId_tag(tagid);
+ 					mvmt.setId_tag_personal(tagid);
+ 					mvmt.setId_tag_pensionado("None");
+ 					mvmt.setId_tag_invitado("None");
 					mvmt.setStatus("Completo");
 					mvmt.setTipe_movement(opcnUsr);
 					
-					nfc_movements nfcm = nfc.create(mvmt);
+					mvmt = nfc.create(mvmt);
 					
 					PrintWriter salida = response.getWriter();
 			        response.setContentType("text/html");
