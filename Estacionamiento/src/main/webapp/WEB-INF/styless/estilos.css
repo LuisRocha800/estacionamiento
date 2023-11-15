@@ -1,0 +1,148 @@
+.contenedorprincipal1 {
+      background-color: #dfdfdf;
+      border-radius: 10px;
+      padding: 10px;
+      width: 400px;
+      height: 200px;
+      text-align: center;
+    }
+    
+.contenedorprincipal2 {
+      background-color: #dfdfdf;
+      border-radius: 10px;
+      padding: 10px;
+      width: 400px;
+      height: 200px;
+      text-align: center;
+    }
+
+.separador {
+	  width: 100px;
+    }
+    
+.formatohorizontal{
+	display: flex;
+	justify-content: center;
+}
+
+
+.btninvitado {
+     background-color: #006bc8;
+     color: #dfdfdf;
+     border: none;
+     border-radius: 5px;
+     padding: 10px 80px;
+     cursor: pointer;
+     font-family: 'Outfit', sans-serif;
+}
+
+.btnpensionado {
+     background-color: #006bc8;
+     color: #dfdfdf;
+     border: none;
+     border-radius: 5px;
+     padding: 10px 80px;
+     cursor: pointer;
+     font-family: 'Outfit', sans-serif;
+}
+
+.btnuser {
+     background-color: #006bc8;
+     color: #dfdfdf;
+     border: none;
+     border-radius: 5px;
+     padding: 10px 80px;
+     cursor: pointer;
+     font-family: 'Outfit', sans-serif;
+}
+
+.btnuser.pressed {
+    animation-name: rebote;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes rebote {
+    0% {
+        transform: translateZ(0);
+    }
+    30% {
+        transform: translateZ(-10px);
+    }
+    50% {
+        transform: translateZ(0);
+    }
+    70% {
+        transform: translateZ(-5px);
+    }
+    100% {
+        transform: translateZ(0);
+    }
+}
+
+header {
+  background-color: #006bc8;
+  color: #dfdfdf;
+  padding: 10px;
+  border-radius: 10px;
+  height: 100px;
+}
+
+.prrf1{
+    margin-right: 10px;
+    
+    margin-bottom: 50px;
+    font-family: 'Outfit', sans-serif; 	
+    display: flex;
+    justify-content: center;
+}
+
+h1{
+	text-align: center;
+	
+}
+
+.msj{
+	font-size: 20px;
+	color: #fff538;
+}
+
+.divapoyo{
+	margin-bottom: 65px; 
+}
+
+.ext1{
+	margin-bottom: 45px; 
+}
+
+label1{
+	font-family: 'Outfit', sans-serif;
+	font-size: 25px;
+}
+
+label2{
+	font-family: 'Outfit', sans-serif;
+}
+
+.ext2{
+	margin-bottom: 20px; 
+}
+
+.ext3{
+	margin-bottom: 30px; 
+}
+
+.piepagina {
+	  background-color: #dfdfdf;
+      border-radius: 10px;
+      color: #333;
+      padding: 10px;
+      height: 40px;
+      text-align: center;
+      font-family: 'Dosis', sans-serif;
+      display: block;
+}
+
+.divapoyo2{
+	margin-bottom: 170px;
+}

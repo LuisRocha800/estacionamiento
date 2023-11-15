@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="js/index.js"></script>
+<title> Control Estacionamiento</title>
+<link rel="stylesheet" href="styles/estilos.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dosis:wght@500;800&family=Quicksand:wght@700&display=swap" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500&display=swap');
+</style>
+</head>	
+<body>
+<header>
+	<div class="prrf1">
+		<div> <h1> CONTROL DE ESTACIONAMIENTO</h1></div>
+		 <div> <h class="msj">(Experimental)</h></div>
+	</div>
+</header>
+<div class="divapoyo">
+	
+</div>
+	<div class="formatohorizontal">
+		<form action="opUsuario">
+<div class="contenedorprincipal1">
+		<div class="ext1"> </div>
+		<label1> ¿PERTENECE AL PERSONAL?</label1> <br>
+		<div class="ext2"> </div>
+		<label2> Presione <b>Usuario</b> para continuar</label2> <br>
+		<div class="ext3"> </div>
+		<input type="hidden" name="usuario" value="personal">
+		<input class="btnuser" type="submit" value="Usuario">
+</div>
+		</form>
+<div class="separador"> </div>
+        <form action="opPensionado">
+<div class="contenedorprincipal2">
+		<div class="ext1"> </div>
+		<label1> ¿ES PENSIONADO?</label1> <br>
+		<div class="ext2"> </div>
+		<label2> Presione <b>Pensionado</b> para continuar como pensionado</label2> <br>
+		<div class="ext3"> </div>
+		<input type="hidden" name="usuario" value="pensionado">
+		<input class="btnpensionado" type="submit" value="Pensionado">
+</div>
+        </form>
+<div class="separador"> </div>
+        <form action="opGuest">
+<div class="contenedorprincipal2">
+		<div class="ext1"> </div>
+		<label1> ¿ES AJENO A LA ORGANIZACION?</label1> <br>
+		<div class="ext2"> </div>
+		<label2> Presione <b>Invitado</b> para continuar como invitado</label2> <br>
+		<div class="ext3"> </div>
+		<input type="hidden" name="usuario" value="invitado">
+		<input class="btninvitado" type="submit" value="Invitado">
+</div>
+        </form>
+</div>
+
+<div class="divapoyo2"> </div>
+<footer class="piepagina"> © 2023 Todos los derechos reservados <br> <b>Version 1.0.0 (beta)</b>
+</footer>
+</body>	
+</html>
