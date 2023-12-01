@@ -115,7 +115,9 @@ public class leerUIDInvitado extends HttpServlet {
 	            
 	            nfc_movementsDaoDerbyImp nfc = new nfc_movementsDaoDerbyImp();
 	            nfc_movements mvmt = new nfc_movements();
-	            mvmt.setId_tag_invitado(url);
+	            
+	            
+	            mvmt.setId_tag_invitado(iddeltag);
 	            
 	            mvmt = nfc.get(mvmt);
 	            
