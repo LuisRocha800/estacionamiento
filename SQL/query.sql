@@ -45,3 +45,8 @@ status VARCHAR(30)
 INSERT INTO PERSONAL VALUES('None','None','None');
 INSERT INTO PENSIONADOS(id_tag, nombre, apellido)  VALUES('None','None','None');
 INSERT INTO TARJETAS  VALUES('None','None');
+
+CREATE TABLE adminusers (
+usuario VARCHAR(100) PRIMARY KEY,
+password VARCHAR(100)
+);
