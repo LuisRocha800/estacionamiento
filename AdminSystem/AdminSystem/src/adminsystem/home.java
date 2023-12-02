@@ -5,11 +5,14 @@ import DaosApp.dao.app.dto.Pensionados;
 import DaosApp.dao.app.dto.Personal;
 import DaosApp.dao.app.dto.adminusers;
 import DaosApp.dao.app.dto.cards;
+import DaosApp.dao.app.dto.nfc_movements;
 import DaosApp.dao.dao.derby.PensionadoDAODerbyImp;
 import DaosApp.dao.dao.derby.PersonalDAODerbyImp;
 import DaosApp.dao.dao.derby.adminusersDAODerbyImp;
 import DaosApp.dao.dao.derby.cardsDaoDerbyImp;
+import DaosApp.dao.dao.derby.nfc_movementsDaoDerbyImp;
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -18,13 +21,21 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 /**
  *
@@ -91,6 +102,21 @@ public class home extends javax.swing.JFrame {
         btnUpdateInv = new javax.swing.JButton();
         btnEliminarInv = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        queryresult = new javax.swing.JTable();
+        btnQuery = new javax.swing.JButton();
+        selectMovement = new javax.swing.JComboBox<>();
+        fechaConsul = new com.toedter.calendar.JDateChooser();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
+        rankpersonal = new javax.swing.JLabel();
+        ocasionesPersonal = new javax.swing.JLabel();
+        rankPensionado = new javax.swing.JLabel();
+        ocasionesPensionado = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
 
         btnSearchPen3.setBackground(new java.awt.Color(0, 107, 200));
         btnSearchPen3.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
@@ -252,7 +278,7 @@ public class home extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtApellidoPersonal, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(154, Short.MAX_VALUE))
+                .addContainerGap(179, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("CRUD Personal", jPanel2);
@@ -383,7 +409,7 @@ public class home extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(idtagPens)
                     .addComponent(btnSearchPen, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
                 .addComponent(jLabel7)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
@@ -392,7 +418,7 @@ public class home extends javax.swing.JFrame {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGap(4, 4, 4)
                         .addComponent(btnActualizarPens, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel8)
@@ -408,12 +434,12 @@ public class home extends javax.swing.JFrame {
                             .addComponent(vigenciaPens, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(comboTiempoSuscripcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(btnEliminarPens, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(81, Short.MAX_VALUE))
+                .addContainerGap(89, Short.MAX_VALUE))
             .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel4Layout.createSequentialGroup()
                     .addGap(81, 81, 81)
                     .addComponent(btnRegistrarPens, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(369, Short.MAX_VALUE)))
+                    .addContainerGap(394, Short.MAX_VALUE)))
         );
 
         jTabbedPane2.addTab("CRUD Pensionados", jPanel4);
@@ -509,7 +535,7 @@ public class home extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnSearchInv, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
                     .addComponent(txtTagInvitado))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 245, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 270, Short.MAX_VALUE)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLimpiarInv, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnClearInv, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -520,15 +546,151 @@ public class home extends javax.swing.JFrame {
 
         jTabbedPane2.addTab("CRUD Invitados", jPanel5);
 
+        jTabbedPane1.setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+
+        queryresult.setAutoCreateRowSorter(true);
+        queryresult.setFont(new java.awt.Font("Poppins", 1, 14)); // NOI18N
+        queryresult.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "PERSONAL", "PENSIONADO", "INVITADO", "FECHA MOVIMIENTO", "HORA MOVIMIENTO", "STATUS", "TIPO MOVIMIENTO"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(queryresult);
+
+        btnQuery.setBackground(new java.awt.Color(0, 107, 200));
+        btnQuery.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+        btnQuery.setForeground(new java.awt.Color(255, 255, 255));
+        btnQuery.setText("Buscar");
+        btnQuery.setToolTipText("");
+        btnQuery.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnQueryActionPerformed(evt);
+            }
+        });
+
+        selectMovement.setFont(new java.awt.Font("Poppins", 0, 12)); // NOI18N
+        selectMovement.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Todos", "Entrada", "Salida" }));
+
+        fechaConsul.setDateFormatString("yyyy-MM-dd");
+
+        jLabel11.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+        jLabel11.setText("TIPO MOVIMIENTO:");
+
+        jLabel12.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+        jLabel12.setText("FECHA ESPECIFICA:");
+
+        rankpersonal.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+
+        ocasionesPersonal.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+
+        rankPensionado.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+
+        ocasionesPensionado.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(rankpersonal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(ocasionesPersonal, javax.swing.GroupLayout.DEFAULT_SIZE, 409, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(rankPensionado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(ocasionesPensionado, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(rankpersonal, javax.swing.GroupLayout.DEFAULT_SIZE, 17, Short.MAX_VALUE)
+                    .addComponent(rankPensionado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ocasionesPersonal, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ocasionesPensionado))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(selectMovement, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fechaConsul, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 382, Short.MAX_VALUE)
+                        .addComponent(btnQuery, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel11)
+                        .addComponent(selectMovement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel12))
+                    .addComponent(fechaConsul, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnQuery, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(175, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Movimientos", jPanel3);
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1191, Short.MAX_VALUE)
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 484, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Movimientos Economicos", jPanel7);
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1191, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 490, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1)
         );
 
         jTabbedPane2.addTab("Business Intelligence", jPanel6);
@@ -1123,7 +1285,196 @@ public class home extends javax.swing.JFrame {
                 e.printStackTrace();
                 }
     }//GEN-LAST:event_btnEliminarPensActionPerformed
+
+    private void btnQueryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQueryActionPerformed
+       DefaultTableModel modelo = (DefaultTableModel) queryresult.getModel();
+       modelo.setRowCount(0);
+       
+       List<nfc_movements> nfc2 = new ArrayList<>();
         
+       String url = ConexionEstatica.CONEXION_CREDENTIALS;
+		
+       try {
+				
+       conexion = DriverManager.getConnection(url);
+       
+                    
+       nfc_movementsDaoDerbyImp derb = new nfc_movementsDaoDerbyImp();
+       derb.setConexion(conexion);
+                    
+       nfc_movements nfc = new nfc_movements();
+
+       String seleccion = (String) selectMovement.getSelectedItem();
+       String opcion = null;
+
+       switch (seleccion) {
+            case "Entrada":
+                opcion = "ingreso";
+                break;
+            case "Salida":
+                opcion = "salida";
+                break;
+            case "Todos":
+                opcion = null;
+                break;
+            default:
+                break;
+        }
+
+        if(opcion != null){
+         nfc.setTipe_movement(opcion);   
+        }
+
+         Date selectedDate = fechaConsul.getDate();
+         
+        if(selectedDate != null){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dateString = dateFormat.format(selectedDate);
+        nfc.setDate_mov(dateString);
+        }
+        
+        nfc2 = derb.get(nfc);
+        
+        DefaultTableModel model = (DefaultTableModel) queryresult.getModel();
+                    
+        for(nfc_movements movement : nfc2){
+            Object[] rowData = {
+                movement.getId_tag_personal(),
+                movement.getId_tag_pensionado(),
+                movement.getId_tag_invitado(),
+                movement.getDate_mov(),
+                movement.getTime_mov(),
+                movement.getStatus(),
+                movement.getTipe_movement()
+            };
+            
+            model.addRow(rowData);
+        }
+        
+        autoResizeAllColumns(queryresult);
+       
+            }catch(SQLException ex) {
+		ex.printStackTrace();
+	}
+       
+               // Map para contar la frecuencia de id_tag_personal
+        Map<String, Integer> frecuenciaIdTagPersonal = new HashMap<>();
+
+        // Contar la frecuencia
+        for (nfc_movements movimiento : nfc2) {
+            String idTagPersonal = movimiento.getId_tag_personal();
+
+            // Ignorar el valor "None"
+            if (idTagPersonal != null && !idTagPersonal.equals("None")) {
+                frecuenciaIdTagPersonal.put(idTagPersonal, frecuenciaIdTagPersonal.getOrDefault(idTagPersonal, 0) + 1);
+            }
+        }
+        
+        String idTagPersonalMasRepetido = null;
+        int maxFrecuencia = 0;
+
+        for (Map.Entry<String, Integer> entry : frecuenciaIdTagPersonal.entrySet()) {
+            if (entry.getValue() > maxFrecuencia) {
+                maxFrecuencia = entry.getValue();
+                idTagPersonalMasRepetido = entry.getKey();
+            }
+        }
+        
+        //
+                       // Map para contar la frecuencia de id_tag_personal
+        Map<String, Integer> frecuenciaIdTagPensionado = new HashMap<>();
+                          
+        // Contar la frecuencia
+        for (nfc_movements movimiento2 : nfc2) {
+            String idTagPensionado = movimiento2.getId_tag_pensionado();
+
+            // Ignorar el valor "None"
+            if (idTagPensionado != null && !idTagPensionado.equals("None")) {
+                frecuenciaIdTagPensionado.put(idTagPensionado, frecuenciaIdTagPensionado.getOrDefault(idTagPensionado, 0) + 1);
+            }
+        }
+        
+        String idTagPensionadoMasRepetido = null;
+        int maxFrecuenciaPens = 0;
+
+        for (Map.Entry<String, Integer> entry : frecuenciaIdTagPensionado.entrySet()) {
+            if (entry.getValue() > maxFrecuenciaPens) {
+                maxFrecuenciaPens = entry.getValue();
+                idTagPensionadoMasRepetido = entry.getKey();
+            }
+        }
+        //
+
+        if(idTagPersonalMasRepetido != null){
+        try {
+            
+        conexion = DriverManager.getConnection(url);
+        
+        PersonalDAODerbyImp personDerby = new PersonalDAODerbyImp();
+        personDerby.setConexion(conexion);
+        Personal personal2 = new Personal();      
+        personal2.setId_tag(idTagPersonalMasRepetido);
+        personal2 = personDerby.get(personal2);
+        
+        rankpersonal.setText("NOMBRE: " + personal2.getNombre()+" "+personal2.getApellido()+"   |   ID CARD: "+personal2.getId_tag());
+        ocasionesPersonal.setText("USO DEL SERVICIO: " + maxFrecuencia+" ocasiones");
+        //conexion.close();
+        } catch(SQLException ex){
+            ex.printStackTrace();
+        } 
+        }else{
+        rankpersonal.setText("NOMBRE:  " +  "   |   ID CARD:");
+        ocasionesPersonal.setText("USO DEL SERVICIO: ");
+        }
+
+        if(idTagPensionadoMasRepetido != null){
+        try {
+            
+        conexion = DriverManager.getConnection(url);
+        
+        PensionadoDAODerbyImp pensionaDerby = new PensionadoDAODerbyImp();
+        pensionaDerby.setConexion(conexion);
+        Pensionados pensionado2 = new Pensionados();      
+        pensionado2.setId_tag(idTagPensionadoMasRepetido);
+        pensionado2 = pensionaDerby.get(pensionado2);
+        
+        rankPensionado.setText("NOMBRE: " + pensionado2.getNombre()+" "+pensionado2.getApellido()+"   |   ID CARD: "+pensionado2.getId_tag());
+        ocasionesPensionado.setText("USO DEL SERVICIO: " + maxFrecuenciaPens+" ocasiones");
+        
+        } catch(Exception ex){
+            ex.printStackTrace();
+        }
+        }else{
+        rankPensionado.setText("NOMBRE:  " +  "   |   ID CARD:");
+        ocasionesPensionado.setText("USO DEL SERVICIO: ");  
+        }
+
+    }//GEN-LAST:event_btnQueryActionPerformed
+        
+   private void autoResizeAllColumns(JTable table) {
+    for (int column = 0; column < table.getColumnCount(); column++) {
+        TableColumn tableColumn = table.getColumnModel().getColumn(column);
+        int preferredWidth = tableColumn.getMinWidth();
+        int maxWidth = tableColumn.getMaxWidth();
+
+        for (int row = 0; row < table.getRowCount(); row++) {
+            TableCellRenderer cellRenderer = table.getCellRenderer(row, column);
+            Component c = table.prepareRenderer(cellRenderer, row, column);
+            int width = c.getPreferredSize().width + table.getIntercellSpacing().width;
+            preferredWidth = Math.max(preferredWidth, width);
+
+            // Si hemos excedido el ancho máximo, rompemos el bucle
+            if (preferredWidth >= maxWidth) {
+                preferredWidth = maxWidth;
+                break;
+            }
+        }
+
+        tableColumn.setPreferredWidth(preferredWidth);
+    
+      }
+    }
+    
     public void tema() {
 
                 java.awt.EventQueue.invokeLater(() -> {
@@ -1153,6 +1504,7 @@ public class home extends javax.swing.JFrame {
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnLimpiarInv;
     private javax.swing.JButton btnLimpiarPens;
+    private javax.swing.JButton btnQuery;
     private javax.swing.JButton btnRegistrarPens;
     private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnSearchInv;
@@ -1161,9 +1513,12 @@ public class home extends javax.swing.JFrame {
     private javax.swing.JButton btnUpdate;
     private javax.swing.JButton btnUpdateInv;
     private javax.swing.JComboBox<String> comboTiempoSuscripcion;
+    private com.toedter.calendar.JDateChooser fechaConsul;
     private javax.swing.JTextField idtagPens;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1174,12 +1529,23 @@ public class home extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTextField nombrePens;
+    private javax.swing.JLabel ocasionesPensionado;
+    private javax.swing.JLabel ocasionesPersonal;
     private javax.swing.JPanel panelEncabezado;
+    private javax.swing.JTable queryresult;
+    private javax.swing.JLabel rankPensionado;
+    private javax.swing.JLabel rankpersonal;
+    private javax.swing.JComboBox<String> selectMovement;
     private javax.swing.JTextField txtApellidoPersonal;
     private javax.swing.JTextField txtNombrePersonal;
     private javax.swing.JTextField txtTagInvitado;

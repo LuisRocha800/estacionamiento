@@ -13,7 +13,9 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -28,29 +30,25 @@ private static Connection conexion;
 			try {
 				
 	            conexion = DriverManager.getConnection(url);
-        		
-                String usuario = "noobmaster";
-                String passwrd = "24112023";
-                
-             	
-	            adminusersDAODerbyImp admusr = new adminusersDAODerbyImp();
-	            admusr.setConexion(conexion);
-	            adminusers usradm = new adminusers();
-	            usradm.setUsuario(usuario);
-	            
-
-	            usradm = admusr.get(usradm);
-	            
-	            System.out.println("RESULT DE CD GET: "+usradm);
                     
-                    if(usradm.getUsuario() == null){
-                        System.out.println("NO EXISTE ESE USUARIO, INTENTA DE NUEVO");
-                    }else if(usradm.getUsuario().equals(usuario) && usradm.getPassword().equals(passwrd) ){
-                       System.out.println("HOLA BIENVENIDO");
-                    }else{
-                       System.out.println("CREDENCIALES INCORRECTAS, TRY IT"); 
-                    }
-         
+                    nfc_movementsDaoDerbyImp derb = new nfc_movementsDaoDerbyImp();
+                    derb.setConexion(conexion);
+                    
+                    nfc_movements nfc = new nfc_movements();
+                    
+                    List<nfc_movements> nfc2 = new ArrayList<>();
+                    
+                    
+                    
+                    nfc.setDate_mov("2023-11-22");
+                    nfc.setTipe_movement("salida");
+        
+                   //nfc2 = derb.get(nfc);
+                            
+                    System.out.println(derb.get(nfc));
+                    
+        		
+              
 				}catch(SQLException ex) {
 				ex.printStackTrace();
 			}

@@ -10,5 +10,5 @@ public interface nfc_movements_DAO {
 	public nfc_movements create(nfc_movements mov);
 	public void delete(nfc_movements mov);
 	public nfc_movements update(nfc_movements mov);
-	public nfc_movements get(nfc_movements mov);
+	List<nfc_movements> get(nfc_movements mov);
 }
