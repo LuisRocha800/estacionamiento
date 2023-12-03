@@ -9,5 +9,5 @@ public interface pagos_DAO {
 	public pagos create(pagos pag);
 	public void delete(pagos pag);
 	public pagos update(pagos pag);
-	public pagos get(pagos pag);
+	public List<pagos> get(pagos pag);
 }

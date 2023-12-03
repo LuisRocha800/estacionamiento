@@ -1,61 +1,86 @@
 package test;
 
 import DaosApp.dao.app.ConexionEstatica;
-import DaosApp.dao.app.dto.adminusers;
-import DaosApp.dao.app.dto.cards;
-import DaosApp.dao.app.dto.nfc_movements;
-import DaosApp.dao.dao.derby.adminusersDAODerbyImp;
-import DaosApp.dao.dao.derby.cardsDaoDerbyImp;
-import DaosApp.dao.dao.derby.nfc_movementsDaoDerbyImp;
+import DaosApp.dao.app.dto.pagos;
+import DaosApp.dao.dao.derby.pagosDaoDerbyImp;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
+
+import javax.swing.*;
+import java.awt.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+public class Main extends JFrame {
 
-public class Main {
+    private static Connection conexion;
 
-private static Connection conexion;
-		
-	public static void main(String [] args){
-		    
-		  String url = ConexionEstatica.CONEXION_CREDENTIALS;
-		
-			try {
-				
-	            conexion = DriverManager.getConnection(url);
-                    
-                    nfc_movementsDaoDerbyImp derb = new nfc_movementsDaoDerbyImp();
-                    derb.setConexion(conexion);
-                    
-                    nfc_movements nfc = new nfc_movements();
-                    
-                    List<nfc_movements> nfc2 = new ArrayList<>();
-                    
-                    
-                    
-                    nfc.setDate_mov("2023-11-22");
-                    nfc.setTipe_movement("salida");
-        
-                   //nfc2 = derb.get(nfc);
-                            
-                    System.out.println(derb.get(nfc));
-                    
-        		
-              
-				}catch(SQLException ex) {
-				ex.printStackTrace();
-			}
-			
-			
-	}
+    public Main(String title, double sumaAmount) {
+        super(title);
 
-	}
+        CategoryDataset dataset = createDataset(sumaAmount);
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Gráfico de la Suma de Amount",
+                "Suma de Amount",
+                "Valor",
+                dataset
+        );
 
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new Dimension(560, 370));
+        setContentPane(chartPanel);
+    }
 
+    private CategoryDataset createDataset(double sumaAmount) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        double normalizedSumaAmount = (sumaAmount / 10000) * 100;
+
+        dataset.addValue(sumaAmount, "Suma Amount", "");
+
+        return dataset;
+    }
+
+     public static void main(String[] args) {
+        String url = ConexionEstatica.CONEXION_CREDENTIALS;
+
+        try {
+            conexion = DriverManager.getConnection(url);
+
+            pagosDaoDerbyImp pag = new pagosDaoDerbyImp();
+            pag.setConexion(conexion);
+
+            List<pagos> resultadoConsulta = pag.consultaEspecial(11, 2023);
+
+            System.out.println(resultadoConsulta);
+
+            double sumaOrigin = 0;
+
+            for (pagos pago : resultadoConsulta) {
+                sumaOrigin += pago.getAmount();
+            }
+
+            System.out.println("GANANCIAS GENERADAS EN ESE PERIODO: " + sumaOrigin);
+
+            final double sumaFinal = sumaOrigin;  // Declarar la variable como final
+
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    Main example = new Main("Gráfico de Suma Amount", sumaFinal);
+                    example.setSize(600, 400);
+                    example.setLocationRelativeTo(null);
+                    example.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                    example.setVisible(true);
+                }
+            });
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+}

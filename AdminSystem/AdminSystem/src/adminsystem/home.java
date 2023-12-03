@@ -6,16 +6,28 @@ import DaosApp.dao.app.dto.Personal;
 import DaosApp.dao.app.dto.adminusers;
 import DaosApp.dao.app.dto.cards;
 import DaosApp.dao.app.dto.nfc_movements;
+import DaosApp.dao.app.dto.pagos;
 import DaosApp.dao.dao.derby.PensionadoDAODerbyImp;
 import DaosApp.dao.dao.derby.PersonalDAODerbyImp;
 import DaosApp.dao.dao.derby.adminusersDAODerbyImp;
 import DaosApp.dao.dao.derby.cardsDaoDerbyImp;
 import DaosApp.dao.dao.derby.nfc_movementsDaoDerbyImp;
+import DaosApp.dao.dao.derby.pagosDaoDerbyImp;
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfWriter;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -44,6 +56,20 @@ import javax.swing.table.TableColumn;
 public class home extends javax.swing.JFrame {
 
     private static Connection conexion;
+    
+    private List<nfc_movements> nfc2 = new ArrayList<>();
+    private List<nfc_movements> nfcMovements = new ArrayList<>();
+    private List<pagos> resultadoConsulta = new ArrayList<>();
+    private String tipoMovimiento;
+    private double sumaOrigin;
+    private String seleccionYear;
+    private String seleccionMonth;
+    private Date selectedDate;
+    private String fechaSeleccionada;
+    private String personalFrecuente;
+    private String fecuenciasPersonal;
+    private String pensionadoFrecuente;
+    private String fecuencuasPensionado;
     
     public home() {
         initComponents();
@@ -116,7 +142,20 @@ public class home extends javax.swing.JFrame {
         ocasionesPersonal = new javax.swing.JLabel();
         rankPensionado = new javax.swing.JLabel();
         ocasionesPensionado = new javax.swing.JLabel();
+        pdfMovimientos = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tablePayments = new javax.swing.JTable();
+        jLabel13 = new javax.swing.JLabel();
+        fechaConsulPayments = new com.toedter.calendar.JDateChooser();
+        jLabel14 = new javax.swing.JLabel();
+        selectYear = new javax.swing.JComboBox<>();
+        jLabel15 = new javax.swing.JLabel();
+        selectMonth = new javax.swing.JComboBox<>();
+        btnBuscarPayments = new javax.swing.JButton();
+        jPanel9 = new javax.swing.JPanel();
+        lblGanancias = new javax.swing.JLabel();
+        pdfGanancias = new javax.swing.JButton();
 
         btnSearchPen3.setBackground(new java.awt.Color(0, 107, 200));
         btnSearchPen3.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
@@ -629,6 +668,17 @@ public class home extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        pdfMovimientos.setBackground(new java.awt.Color(0, 107, 200));
+        pdfMovimientos.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+        pdfMovimientos.setForeground(new java.awt.Color(255, 255, 255));
+        pdfMovimientos.setText("Generar PDF");
+        pdfMovimientos.setToolTipText("");
+        pdfMovimientos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pdfMovimientosActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -645,9 +695,14 @@ public class home extends javax.swing.JFrame {
                         .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(fechaConsul, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 382, Short.MAX_VALUE)
-                        .addComponent(btnQuery, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 376, Short.MAX_VALUE)
+                        .addComponent(btnQuery, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
                     .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pdfMovimientos, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -664,20 +719,139 @@ public class home extends javax.swing.JFrame {
                     .addComponent(btnQuery, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(175, Short.MAX_VALUE))
+                .addGap(96, 96, 96)
+                .addComponent(pdfMovimientos, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                .addGap(44, 44, 44))
         );
 
         jTabbedPane1.addTab("Movimientos", jPanel3);
+
+        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
+
+        tablePayments.setAutoCreateRowSorter(true);
+        tablePayments.setFont(new java.awt.Font("Poppins", 1, 14)); // NOI18N
+        tablePayments.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "FECHA", "HORA", "TIEMPO DE SERVICIO(minutos)", "MONTO", "ESTADO"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane2.setViewportView(tablePayments);
+
+        jLabel13.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+        jLabel13.setText("FECHA ESPECIFICA:");
+
+        fechaConsulPayments.setDateFormatString("yyyy-MM-dd");
+
+        jLabel14.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+        jLabel14.setText("AÑO ESPECIFICO:");
+
+        selectYear.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ninguno", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030" }));
+
+        jLabel15.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+        jLabel15.setText("MES ESPECIFICO:");
+
+        selectMonth.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ninguno", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" }));
+
+        btnBuscarPayments.setBackground(new java.awt.Color(0, 107, 200));
+        btnBuscarPayments.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+        btnBuscarPayments.setForeground(new java.awt.Color(255, 255, 255));
+        btnBuscarPayments.setText("Buscar");
+        btnBuscarPayments.setToolTipText("");
+        btnBuscarPayments.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarPaymentsActionPerformed(evt);
+            }
+        });
+
+        lblGanancias.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblGanancias, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblGanancias, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        pdfGanancias.setBackground(new java.awt.Color(0, 107, 200));
+        pdfGanancias.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+        pdfGanancias.setForeground(new java.awt.Color(255, 255, 255));
+        pdfGanancias.setText("Generar PDF");
+        pdfGanancias.setToolTipText("");
+        pdfGanancias.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pdfGananciasActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1191, Short.MAX_VALUE)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1179, Short.MAX_VALUE)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fechaConsulPayments, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(selectYear, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(selectMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnBuscarPayments, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(pdfGanancias, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 484, Short.MAX_VALUE)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel13)
+                    .addComponent(fechaConsulPayments, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel14)
+                        .addComponent(selectYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel15)
+                        .addComponent(selectMonth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnBuscarPayments, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(12, 12, 12)
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(66, 66, 66)
+                .addComponent(pdfGanancias, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                .addGap(84, 84, 84))
         );
 
         jTabbedPane1.addTab("Movimientos Economicos", jPanel7);
@@ -1287,11 +1461,18 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEliminarPensActionPerformed
 
     private void btnQueryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQueryActionPerformed
+       nfcMovements.clear();
+       personalFrecuente = "";
+       fecuenciasPersonal = "";
+       pensionadoFrecuente = "";
+       fecuencuasPensionado = "";
+       
+        
        DefaultTableModel modelo = (DefaultTableModel) queryresult.getModel();
        modelo.setRowCount(0);
        
-       List<nfc_movements> nfc2 = new ArrayList<>();
-        
+       String var = null;
+    
        String url = ConexionEstatica.CONEXION_CREDENTIALS;
 		
        try {
@@ -1310,12 +1491,15 @@ public class home extends javax.swing.JFrame {
        switch (seleccion) {
             case "Entrada":
                 opcion = "ingreso";
+                var = "Ingreso";
                 break;
             case "Salida":
                 opcion = "salida";
+                var = "Salida";
                 break;
             case "Todos":
                 opcion = null;
+                var = "Todos los movimientos";
                 break;
             default:
                 break;
@@ -1331,6 +1515,9 @@ public class home extends javax.swing.JFrame {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateString = dateFormat.format(selectedDate);
         nfc.setDate_mov(dateString);
+        fechaSeleccionada = dateString;
+        }else{
+        fechaSeleccionada = "Ninguna";  
         }
         
         nfc2 = derb.get(nfc);
@@ -1350,6 +1537,8 @@ public class home extends javax.swing.JFrame {
             
             model.addRow(rowData);
         }
+        
+        nfcMovements.addAll(nfc2);
         
         autoResizeAllColumns(queryresult);
        
@@ -1418,6 +1607,9 @@ public class home extends javax.swing.JFrame {
         
         rankpersonal.setText("NOMBRE: " + personal2.getNombre()+" "+personal2.getApellido()+"   |   ID CARD: "+personal2.getId_tag());
         ocasionesPersonal.setText("USO DEL SERVICIO: " + maxFrecuencia+" ocasiones");
+        
+        personalFrecuente = "NOMBRE: " + personal2.getNombre()+" "+personal2.getApellido();
+        fecuenciasPersonal = "USO DEL SERVICIO: " + maxFrecuencia+" ocasiones";
         //conexion.close();
         } catch(SQLException ex){
             ex.printStackTrace();
@@ -1440,6 +1632,8 @@ public class home extends javax.swing.JFrame {
         
         rankPensionado.setText("NOMBRE: " + pensionado2.getNombre()+" "+pensionado2.getApellido()+"   |   ID CARD: "+pensionado2.getId_tag());
         ocasionesPensionado.setText("USO DEL SERVICIO: " + maxFrecuenciaPens+" ocasiones");
+        pensionadoFrecuente = "NOMBRE: " + pensionado2.getNombre()+" "+pensionado2.getApellido();
+        fecuencuasPensionado = "USO DEL SERVICIO: " + maxFrecuenciaPens+" ocasiones";
         
         } catch(Exception ex){
             ex.printStackTrace();
@@ -1448,8 +1642,205 @@ public class home extends javax.swing.JFrame {
         rankPensionado.setText("NOMBRE:  " +  "   |   ID CARD:");
         ocasionesPensionado.setText("USO DEL SERVICIO: ");  
         }
+        
+        tipoMovimiento = var;
 
     }//GEN-LAST:event_btnQueryActionPerformed
+
+    private void pdfMovimientosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pdfMovimientosActionPerformed
+      try{
+       prueba();
+      } catch(Exception e){
+          e.printStackTrace();
+      }
+    }//GEN-LAST:event_pdfMovimientosActionPerformed
+
+    private void btnBuscarPaymentsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarPaymentsActionPerformed
+
+       sumaOrigin = 0;
+       
+       DefaultTableModel modelo = (DefaultTableModel) tablePayments.getModel();
+       modelo.setRowCount(0);
+       
+       String var = null;
+    
+       String url = ConexionEstatica.CONEXION_CREDENTIALS;
+		
+       try {
+				
+       conexion = DriverManager.getConnection(url);
+       
+                    
+       pagosDaoDerbyImp pag = new pagosDaoDerbyImp();
+       pag.setConexion(conexion);
+                    
+       pagos pg = new pagos();
+
+       seleccionYear = (String) selectYear.getSelectedItem();
+       int opcionYear = 0;
+       seleccionMonth = (String) selectMonth.getSelectedItem();
+       int opcionMonth = 0;
+
+       switch (seleccionYear) {
+           
+            case "2023":
+                opcionYear = 2023;
+                break;
+            case "2024":
+                opcionYear = 2024;
+                break;
+            case "2025":
+                opcionYear = 2025;
+             break;
+            case "2026":
+                opcionYear = 2026;
+                break;
+            case "2027":
+                opcionYear = 2027;
+                break;
+            case "2028":
+                opcionYear = 2028;
+                break;
+            case "2029":
+                opcionYear = 2029;
+                break;
+            case "2030":
+                opcionYear = 2030;
+                break;
+            default:
+                break;
+        }
+       
+       switch(seleccionMonth){
+           case "Enero":
+               opcionMonth = 1;
+           break;
+           case "Febrero":
+               opcionMonth = 2;
+           break;
+           case "Marzo":
+               opcionMonth = 3;
+           break;
+           case "Abril":
+               opcionMonth = 4;
+           break;
+           case "Mayo":
+               opcionMonth = 5;
+           break;
+           case "Junio":
+               opcionMonth = 6;
+           break;
+           case "Julio":
+               opcionMonth = 7;
+           break;
+           case "Agosto":
+               opcionMonth = 8;
+           break;
+           case "Septiembre":
+               opcionMonth = 9;
+           break;
+           case "Octubre":
+               opcionMonth = 10;
+           break;
+           case "Noviembre":
+               opcionMonth = 11;
+           break;
+           case "Diciembre":
+               opcionMonth = 12;
+           break;
+           default:
+           break;
+       }
+       
+       selectedDate = fechaConsulPayments.getDate();
+       
+       // fecha esta lleno y (mes = ninguno y year = ninguno)
+       if(selectedDate != null && opcionMonth != 0 && opcionYear != 0){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dateString = dateFormat.format(selectedDate);
+        pg.setDate_payment(dateString);
+        
+        resultadoConsulta = pag.get(pg);
+        
+       }
+       // fecha esta lleno y (mes = ninguno o year = ninguno)
+       if(selectedDate != null && opcionMonth != 0 && opcionYear == 0){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dateString = dateFormat.format(selectedDate);
+        pg.setDate_payment(dateString); 
+        
+        resultadoConsulta = pag.get(pg);
+       }
+       // fecha esta lleno y (mes difetente de ninguno y year diferente ninguno)
+       if(selectedDate != null && opcionMonth == 0 && opcionYear != 0){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dateString = dateFormat.format(selectedDate);
+        pg.setDate_payment(dateString);
+        
+        resultadoConsulta = pag.get(pg);
+       }
+       // fecha esta lleno y (mes diferente de ninguno o year diferente de ninguno)
+       if(selectedDate != null && opcionMonth == 0 && opcionYear == 0){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dateString = dateFormat.format(selectedDate);
+        pg.setDate_payment(dateString);  
+        
+        resultadoConsulta = pag.get(pg);
+       }
+       if(selectedDate == null && opcionMonth != 0 && opcionYear != 0){
+       resultadoConsulta = pag.consultaEspecial( opcionMonth, opcionYear); 
+       
+       }
+       
+       if(selectedDate == null && opcionMonth != 0 && opcionYear == 0){
+       resultadoConsulta = pag.consultaEspecialMonth( opcionMonth); 
+       }
+       
+       if(selectedDate == null && opcionMonth == 0 && opcionYear != 0){
+        resultadoConsulta = pag.consultaEspecialYear( opcionYear); 
+       }
+       
+       if(selectedDate == null && opcionMonth == 0 && opcionYear == 0){
+           resultadoConsulta = pag.get(pg);
+       }
+       
+       System.out.println("RES DE RESULTADOCONSULTA: "+resultadoConsulta);
+
+       DefaultTableModel model = (DefaultTableModel) tablePayments.getModel();
+                    
+        for(pagos pago : resultadoConsulta){
+            Object[] rowData = {
+                pago.getDate_payment(),
+                pago.getTime_payment(),
+                pago.getTime_service(),
+                pago.getAmount(),
+                pago.getStatus(),
+            };
+            
+            model.addRow(rowData);
+        }
+        
+        autoResizeAllColumns(queryresult);
+       
+        for (pagos pago : resultadoConsulta) {
+        sumaOrigin += pago.getAmount();
+    
+        }
+        
+        lblGanancias.setText("GANANCIAS GENERADAS EN ESE PERIODO DE TIEMPO: "+sumaOrigin+" Pesos MXN");
+        
+       } catch(SQLException e){
+           e.printStackTrace();
+       }
+    }//GEN-LAST:event_btnBuscarPaymentsActionPerformed
+
+    private void pdfGananciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pdfGananciasActionPerformed
+      try{
+       pdfGanancias();
+      } catch(Exception e){
+          e.printStackTrace();
+      }
+    }//GEN-LAST:event_pdfGananciasActionPerformed
         
    private void autoResizeAllColumns(JTable table) {
     for (int column = 0; column < table.getColumnCount(); column++) {
@@ -1474,6 +1865,251 @@ public class home extends javax.swing.JFrame {
     
       }
     }
+   
+    private void prueba() {
+            Date fechaActual = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String fechaResultado = dateFormat.format(fechaActual); 
+            
+            String userHome = System.getProperty("user.home");
+        String documentsPath = userHome + "\\Documents\\MyAdminSystem\\";
+
+        File directory = new File(documentsPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String pdfFileName = "ReporteMovimientos_" + fechaResultado + ".pdf";
+        int count = 1;
+        while (new File(documentsPath + pdfFileName).exists()) {
+            pdfFileName = "ReporteMovimientos_" + fechaResultado + "_" + count + ".pdf";
+            count++;
+        }
+        
+        Document document = new Document();
+
+        try {
+            // step 2: creation of the writer
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(documentsPath + pdfFileName));
+            // step 3: we open the document
+            document.open();
+            
+            // step 4: we grab the ContentByte and do some stuff with it
+            PdfContentByte cb = writer.getDirectContent();
+            Graphics g = cb.createGraphicsShapes(PageSize.LETTER.getWidth(), PageSize.LETTER.getHeight());
+
+            //--------------------- pagina 1 --------------------------
+            g.setColor(Color.blue);
+            g.drawRect(1, 1, 593, 790);    
+            
+            Font font1 = new Font("Poppins", Font.BOLD, 12);
+            Font font2 = new Font("Poppins", Font.BOLD, 10);
+            Font font3 = new Font("Poppins", Font.BOLD, 8);
+            
+            g.setFont(font1);
+            g.setColor(Color.blue);
+            g.drawString("CONTROL DE ESTACIONAMIENTO", 200,40);
+                 
+            g.setFont(font2);
+            g.setColor(Color.blue);
+            g.drawString("REPORTE DE MOVIMIENTOS", 20, 70);
+            g.setFont(font3);
+            g.setColor(Color.black);
+            g.drawString("FECHA EXPEDICION: "+fechaResultado, 20, 90);
+            System.out.println("TIPO MOV: "+tipoMovimiento);
+            g.setFont(font2);
+            g.drawString("--------------------------------------------------------------------", 20, 110);
+            
+            g.setColor(Color.blue);
+            g.drawString("PARAMETROS DE CONSULTA", 20, 130);
+            g.setFont(font3);
+            g.setColor(Color.black);
+            g.drawString("TIPO DE MOVIMIENTO: "+tipoMovimiento, 20, 150);
+            g.drawString("FECHA ESPECIFICADA: "+fechaSeleccionada, 20, 170);
+            
+            g.setFont(font2);
+            g.drawString("--------------------------------------------------------------------", 20, 110);
+            
+            g.setColor(Color.blue);
+            g.drawString("PERSONAL QUE MAS UTILIZO EL SERVICIO", 20, 190);
+            g.setFont(font3);
+            g.setColor(Color.black);
+            g.drawString(personalFrecuente, 20, 210);
+            g.drawString(fecuenciasPersonal, 20, 230);
+            
+            g.setFont(font2);
+            g.drawString("--------------------------------------------------------------------", 20, 250);
+            
+            g.setColor(Color.blue);
+            g.drawString("PENSIONADO QUE MAS UTILIZO EL SERVICIO", 20, 270);
+            g.setFont(font3);
+            g.setColor(Color.black);
+            g.drawString(pensionadoFrecuente, 20, 290);
+            g.drawString(fecuencuasPensionado, 20, 310);
+            
+            g.setFont(font2);
+            g.drawString("--------------------------------------------------------------------", 20, 330);
+            
+            g.setColor(Color.blue);
+            g.drawString("HISTORIAL DE MOVIMIENTOS", 20, 350);
+            
+            int startX = 20;
+            int startY = 370;
+
+            g.setFont(font3);
+            g.setColor(Color.blue);
+            g.drawString("CARD PERSONAL", startX, startY);
+            g.drawString("CARD PENSIONADO", startX + 80, startY);  //120
+            g.drawString("CARD INVITADO", startX + 160, startY); //200
+            g.drawString("FECHA", startX + 240 , startY); //280
+            g.drawString("HORA", startX + 320, startY); //360
+            g.drawString("ESTADO", startX + 400, startY);//440
+            g.drawString("TIPO DE MOVIMIENTO", startX + 480, startY);//520
+
+            g.setColor(Color.black);
+            int rowHeight = 20;
+            for (int i = 0; i < nfcMovements.size(); i++) {
+                nfc_movements movement2 = nfcMovements.get(i);
+                g.drawString(movement2.getId_tag_personal(), startX, startY + (i + 1) * rowHeight);
+                g.drawString(movement2.getId_tag_pensionado(), startX +80, startY + (i + 1) * rowHeight);
+                g.drawString(movement2.getId_tag_invitado(), startX+160, startY + (i + 1) * rowHeight);
+                g.drawString(movement2.getDate_mov(), startX + 240, startY + (i + 1) * rowHeight);
+                g.drawString(movement2.getTime_mov(), startX + 320, startY + (i + 1) * rowHeight);
+                g.drawString(movement2.getStatus(), startX + 400, startY + (i + 1) * rowHeight);
+                g.drawString(movement2.getTipe_movement(), startX + 480, startY + (i + 1) * rowHeight);
+            }
+            
+            //document.newPage();
+            //--------------------- pagina 2 --------------------------
+            
+        } catch (DocumentException de) {
+            System.err.println(de.getMessage());
+        } catch (FileNotFoundException ex) {
+            System.err.println(ex.getMessage());
+        }
+
+        // step 5: we close the document
+        document.close();
+
+        JOptionPane.showMessageDialog(null, 
+                "Se creo el archivo PDF en la carpeta MyAdminSystem de Documents");
+    }
+    
+    private void pdfGanancias() {
+
+        Date fechaActual = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String fechaResultado = dateFormat.format(fechaActual);       
+        
+        String userHome = System.getProperty("user.home");
+        String documentsPath = userHome + "\\Documents\\MyAdminSystem\\";
+
+        File directory = new File(documentsPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        
+        String pdfFileName = "ReporteGanancias_" + fechaResultado + ".pdf";
+        int count = 1;
+        while (new File(documentsPath + pdfFileName).exists()) {
+            pdfFileName = "ReporteGanancias_" + fechaResultado + "_" + count + ".pdf";
+            count++;
+        }
+        
+        Document document = new Document();
+
+        try {
+            // step 2: creation of the writer
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(documentsPath + pdfFileName));
+
+            // step 3: we open the document
+            document.open();
+            
+            // step 4: we grab the ContentByte and do some stuff with it
+            PdfContentByte cb = writer.getDirectContent();
+            Graphics g = cb.createGraphicsShapes(PageSize.LETTER.getWidth(), PageSize.LETTER.getHeight());
+
+            //--------------------- pagina 1 --------------------------
+            g.setColor(Color.blue);
+            g.drawRect(1, 1, 593, 790);    
+            
+            Font font1 = new Font("Poppins", Font.BOLD, 12);
+            Font font2 = new Font("Poppins", Font.BOLD, 10);
+            Font font3 = new Font("Poppins", Font.BOLD, 8);
+            
+            g.setFont(font1);
+            g.setColor(Color.blue);
+            g.drawString("CONTROL DE ESTACIONAMIENTO", 200,40);
+                 
+            g.setFont(font2);
+            g.setColor(Color.blue);
+            g.drawString("REPORTE DE GANANCIAS", 20, 70);
+            g.setFont(font3);
+            g.setColor(Color.black);
+            g.drawString("FECHA EXPEDICION: "+fechaResultado, 20, 90);
+            g.setFont(font2);
+            g.drawString("--------------------------------------------------------------------", 20, 110);
+            
+            g.setColor(Color.blue);
+            g.drawString("PARAMETROS DE CONSULTA", 20, 130);
+            g.setFont(font3);
+            g.setColor(Color.black);
+            g.drawString("FECHA ESPECIFICA: "+selectedDate, 20, 150);
+            g.drawString("MES ESPECIFICO: "+seleccionMonth, 20, 170);
+            g.drawString("AÑO ESPECIFICO: "+seleccionYear, 20, 190);
+            
+            g.setFont(font2);
+            g.drawString("--------------------------------------------------------------------", 20, 210);
+            
+            g.setColor(Color.blue);
+            g.drawString("GANANCIAS OBTENIDAS EN EL PERIODO ESPECIFICADO", 20, 230);
+            g.setFont(font3);
+            g.setColor(Color.black);
+            g.drawString(sumaOrigin+" Pesos MXN", 20, 250);
+            
+            g.setFont(font2);
+            g.drawString("--------------------------------------------------------------------", 20, 270);
+            
+            g.setColor(Color.blue);
+            g.drawString("HISTORIAL DE MOVIMIENTOS", 20, 290);
+            
+            int startX = 20;
+            int startY = 310;
+
+            g.setFont(font3);
+            g.setColor(Color.blue);
+            g.drawString("FECHA", startX, startY);
+            g.drawString("HORA", startX + 80, startY);  //120
+            g.drawString("TIEMPO DE SERVICIO", startX + 160, startY); //200
+            g.drawString("MONTO", startX + 240 , startY); //280
+            g.drawString("ESTADO", startX + 320, startY); //360
+
+            g.setColor(Color.black);
+            int rowHeight = 20;
+            for (int i = 0; i < resultadoConsulta.size(); i++) {
+                pagos pagoo2 = resultadoConsulta.get(i);
+                g.drawString(pagoo2.getDate_payment(), startX, startY + (i + 1) * rowHeight);
+                g.drawString(pagoo2.getTime_payment(), startX +80, startY + (i + 1) * rowHeight);
+                g.drawString(pagoo2.getTime_service()+" minutos", startX+160, startY + (i + 1) * rowHeight);
+                g.drawString(pagoo2.getAmount()+" MXN", startX + 240, startY + (i + 1) * rowHeight);
+                g.drawString(pagoo2.getStatus(), startX + 320, startY + (i + 1) * rowHeight);
+            }
+            
+            //document.newPage();
+            //--------------------- pagina 2 --------------------------
+            
+        } catch (DocumentException de) {
+            System.err.println(de.getMessage());
+        } catch (FileNotFoundException ex) {
+            System.err.println(ex.getMessage());
+        }
+
+        // step 5: we close the document
+        document.close();
+
+        JOptionPane.showMessageDialog(null, 
+                "Se creo el archivo PDF en la carpeta MyAdminSystem de Documents");
+    }
     
     public void tema() {
 
@@ -1496,6 +2132,7 @@ public class home extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField apellidoPens;
     private javax.swing.JButton btnActualizarPens;
+    private javax.swing.JButton btnBuscarPayments;
     private javax.swing.JButton btnClearInv;
     private javax.swing.JButton btnCrear;
     private javax.swing.JButton btnEliminar;
@@ -1514,11 +2151,15 @@ public class home extends javax.swing.JFrame {
     private javax.swing.JButton btnUpdateInv;
     private javax.swing.JComboBox<String> comboTiempoSuscripcion;
     private com.toedter.calendar.JDateChooser fechaConsul;
+    private com.toedter.calendar.JDateChooser fechaConsulPayments;
     private javax.swing.JTextField idtagPens;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1535,17 +2176,25 @@ public class home extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JLabel lblGanancias;
     private javax.swing.JTextField nombrePens;
     private javax.swing.JLabel ocasionesPensionado;
     private javax.swing.JLabel ocasionesPersonal;
     private javax.swing.JPanel panelEncabezado;
+    private javax.swing.JButton pdfGanancias;
+    private javax.swing.JButton pdfMovimientos;
     private javax.swing.JTable queryresult;
     private javax.swing.JLabel rankPensionado;
     private javax.swing.JLabel rankpersonal;
+    private javax.swing.JComboBox<String> selectMonth;
     private javax.swing.JComboBox<String> selectMovement;
+    private javax.swing.JComboBox<String> selectYear;
+    private javax.swing.JTable tablePayments;
     private javax.swing.JTextField txtApellidoPersonal;
     private javax.swing.JTextField txtNombrePersonal;
     private javax.swing.JTextField txtTagInvitado;
